@@ -1,0 +1,13 @@
+# JetBrains IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Editors
+*.swp
+*~
+
+# Misc
+.DS_Store
+.bak
