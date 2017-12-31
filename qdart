@@ -1,60 +1,147 @@
 #!/bin/bash
 
-# ddev () { pub run dart_dev }
-# dart-generate-tests () { ddev gen-test-runner }
-# dart-serve () { ddev serve }
-# dart-serve-chrome () { ddev serve --web-compiler=dart2js }
-dart-get () {
+# Chromium functions
+chromium-checked-mode () {
+  open /usr/local/opt/dart/Chromium.app --args --checked
+}
+
+# Pub functions
+ddev () {
+  pub run dart_dev
+}
+
+pub-clean () {
+  rm -rf .pub .packages pubspec.lock && find . -name packages | xargs rm -rf
+}
+
+pub-clean-cache () {
+  rm -rf ~/.pub-cache
+}
+
+pub-generate-tests () {
+  ddev gen-test-runner
+}
+
+pub-get () {
   pub get --packages-dir
 }
-# # Individual unit tests: ddev test -n 'render a given workspace membership'
-#
-# # Pub
-# # export PATH=$PATH:~/.pub-cache/bin
-#  pub-super-clean='pub-clean && pub-cache-clean'
-#  pub-clean='rm -rf .pub .packages pubspec.lock && find . -name packages | xargs rm -rf'
-#  pub-cache-clean='rm -rf ~/.pub-cache'
-#  pub-get-solver='pub get --packages-dir --verbosity=solver'
-#  pub-get-solver-inconsistent='pub get --packages-dir --verbosity solver | grep "inconsistent" -A 2 | sed -e "s/\ |//g"'
-#  pub-reset-locks='git reset origin/master -- pubspec.lock && git reset origin/master -- app/pubspec.lock'
-#
-#  w-super-clean='(pub-clean && cd app && pub-clean) && pub-cache-clean'
-#  w-clean='(pub-clean && cd app && pub-clean)'
-#  w-format='(ddev format)'
-#  w-upgrade='(pub upgrade && cd app && pub upgrade)'
-# #  w-get='(pub get --packages-dir && cd app && pub get --packages-dir)'
-#  w-gformat='w-get && w-format'
-#  w-gfserve='w-get && w-format && w-serve'
-#  w-gfsserve='w-get && w-format && w-sass-refresh && w-serve'
-#  w-gserve='w-get && w-serve'
-#  w-sass-refresh='(./tool/sass.sh)'
-#  w-serve='(cd app && ddev serve)'
-#  w-serve-chrome='(cd app && dart-serve-chrome)'
 
-w-get () {
+pub-serve () {
+  ddev serve
+}
+
+pub-serve-chrome () {
+  ddev serve --web-compiler=dart2js
+}
+
+pub-upgrade () {
+  pub upgrade
+}
+
+pub-get-solver () {
+  pub get --packages-dir --verbosity=solver
+}
+
+pub-get-solver-inconsistent () {
+  pub get --packages-dir --verbosity solver | grep "inconsistent" -A 2 | sed -e "s/\ |//g"
+}
+
+q-clean () {
+  echo '--- Cleaning root pub dependencies ---'
+  pub-clean
+
+  if [ -d "app" ]; then
+    echo '--- Cleaning app pub dependencies ---'
+    (cd app && pub-clean)
+  fi
+
+  if [ -d "test/signals" ]; then
+    echo '--- Cleaning signals pub dependencies ---'
+    (cd test/signals && pub-clean)
+  fi
+}
+
+q-clean-all () {
+  echo '--- Cleaning root pub dependencies ---'
+  pub-clean
+
+  if [ -d "app" ]; then
+    echo '--- Cleaning app pub dependencies ---'
+    (cd app && pub-clean)
+  fi
+
+  if [ -d "test/signals" ]; then
+    echo '--- Cleaning signals pub dependencies ---'
+    (cd test/signals && pub-clean)
+  fi
+
+  pub-clean-cache
+}
+
+q-format () {
+  echo '--- Formatting project ---'
+  ddev format
+}
+
+q-get () {
   echo '--- Getting root pub dependencies ---'
-  dart-get
+  pub-get
 
   if [ -d "app" ]; then
     echo '--- Getting app pub dependencies ---'
-    (cd app && dart-get)
+    (cd app && pub-get)
   fi
 
   if [ -d "test/signals" ]; then
     echo '--- Getting signals pub dependencies ---'
-    (cd test/signals && dart-get)
+    (cd test/signals && pub-get)
+  fi
+}
+
+q-serve () {
+  if [ -d "app" ]; then
+    echo '--- Serving project in app directory ---'
+    (cd app && pub-serve)
+  else
+    echo '--- Serving project ---'
+    pub-serve
+  fi
+}
+
+q-upgrade () {
+  echo '--- Upgrading root pub dependencies ---'
+  pub-upgrade
+
+  if [ -d "app" ]; then
+    echo '--- Upgrading app pub dependencies ---'
+    (cd app && pub-upgrade)
+  fi
+
+  if [ -d "test/signals" ]; then
+    echo '--- Upgrading signals pub dependencies ---'
+    (cd test/signals && pub-upgrade)
   fi
 }
 
 usage () {
-  echo "${underline}${bold}Usage${normal}"
+  echo "${underline}${bold}GNU Usage${normal}"
   echo "    ./qdart [options]"
   echo
+  echo "${underline}${bold}POSIX Usage${normal}"
+  echo "    ./qdart -[single letter options]"
+  echo
   echo "${underline}${bold}Options${normal}"
-  echo "                --help, -h Display this help text."
+  echo "                --clean, -c Clear out pub dependencies."
+  echo "                --format, -f Format dart code."
+  echo "                --get, -g Get pub dependencies."
+  echo "                --help, -h Display this usage text."
+  echo "                --serve, -s Serve pub code."
+  echo "                --upgrade, -u Upgrade pub dependencies."
   echo
   echo "${underline}${bold}Example${normal}"
-  echo "    ./qdart -h --help"
+  echo "    ./qdart --clean --get --serve"
+  echo "    ./qdart -cgs"
+  echo "    ./qdart -clean -gs"
 }
 
 options_found=0
@@ -62,24 +149,28 @@ while [ "$1" != "" ]; do
   options_found=1
   # Attempt to use GNU standard syntax
   case $1 in
+    --clean)
+      q-clean
+      shift
+      ;;
+    --format)
+      q-format
+      shift
+      ;;
+    --get)
+      q-get
+      shift
+      ;;
     --help)
       usage
       shift
       ;;
-    --get)
-      w-get
-      shift
-      ;;
-    --format)
-      w-format
-      shift
-      ;;
     --serve)
-      w-serve
+      q-serve
       shift
       ;;
     --upgrade)
-      w-upgrade
+      q-upgrade
       shift
       ;;
     *--*)
@@ -90,22 +181,25 @@ while [ "$1" != "" ]; do
       ;;
     -*)
       # POSIX standard syntax
-      while getopts :gfsut- opt; do
+      while getopts :cfghsu- opt; do
         case $opt in
-          g)
-            w-get
+          c)
+            q-clean
             ;;
           f)
-            w-format
+            q-format
+            ;;
+          g)
+            q-get
+            ;;
+          h)
+            usage
             ;;
           s)
-            w-serve
+            q-serve
             ;;
           u)
-            w-upgrade
-            ;;
-          t)
-            echo "test"
+            q-upgrade
             ;;
           -)
             # Invalid use of '-' or GNU standard
@@ -133,33 +227,3 @@ if ((!options_found)); then
   echo -e "No arguments found\n"
   usage
 fi
-
-# options_found=0
-# while getopts :ggetfformatsserveuupgrade opt; do
-#   options_found=1
-#   case $opt in
-#     g | get)
-#       w-get
-#       ;;
-#     f | format)
-#       w-format
-#       ;;
-#     s | serve)
-#       w-serve
-#       ;;
-#     u | upgrade)
-#       w-upgrade
-#       ;;
-#     *)
-#       echo "Invalid Option: $OPTARG $opt" >&2
-#       usage
-#       exit 1
-#       ;;
-#   esac
-# done
-# shift $(($OPTIND-1))
-#
-# if ((!options_found)); then
-#   echo "No arguments found"
-#   usage
-# fi
