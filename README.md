@@ -23,6 +23,7 @@ Options
                 --get, -g Get pub dependencies.
                 --help, -h Display this usage text.
                 --serve, -s Serve pub code.
+                --test, -t Test pub code.
                 --upgrade, -u Upgrade pub dependencies.
 
 Example

@@ -6,10 +6,6 @@ chromium-checked-mode () {
 }
 
 # Pub functions
-ddev () {
-  pub run dart_dev
-}
-
 pub-clean () {
   rm -rf .pub .packages pubspec.lock && find . -name packages | xargs rm -rf
 }
@@ -19,7 +15,7 @@ pub-clean-cache () {
 }
 
 pub-generate-tests () {
-  ddev gen-test-runner
+  pub run dart_dev gen-test-runner
 }
 
 pub-get () {
@@ -27,11 +23,11 @@ pub-get () {
 }
 
 pub-serve () {
-  ddev serve
+  pub run dart_dev serve
 }
 
 pub-serve-chrome () {
-  ddev serve --web-compiler=dart2js
+  pub run dart_dev serve --web-compiler=dart2js
 }
 
 pub-upgrade () {
@@ -80,7 +76,7 @@ q-clean-all () {
 
 q-format () {
   echo '--- Formatting project ---'
-  ddev format
+  pub run dart_dev format
 }
 
 q-get () {
@@ -106,6 +102,11 @@ q-serve () {
     echo '--- Serving project ---'
     pub-serve
   fi
+}
+
+q-test () {
+  echo '--- Testing project ---'
+  pub run dart_dev test
 }
 
 q-upgrade () {
@@ -136,6 +137,7 @@ usage () {
   echo "                --get, -g Get pub dependencies."
   echo "                --help, -h Display this usage text."
   echo "                --serve, -s Serve pub code."
+  echo "                --test, -t Test pub code."
   echo "                --upgrade, -u Upgrade pub dependencies."
   echo
   echo "${underline}${bold}Example${normal}"
@@ -169,6 +171,10 @@ while [ "$1" != "" ]; do
       q-serve
       shift
       ;;
+    --test)
+      q-test
+      shift
+      ;;
     --upgrade)
       q-upgrade
       shift
@@ -197,6 +203,9 @@ while [ "$1" != "" ]; do
             ;;
           s)
             q-serve
+            ;;
+          t)
+            q-test
             ;;
           u)
             q-upgrade
