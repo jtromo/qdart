@@ -1,11 +1,12 @@
 #!/bin/bash
 
-# Chromium functions
+# Helper functions
+
+# not used yet
 chromium-checked-mode () {
   open /usr/local/opt/dart/Chromium.app --args --checked
 }
 
-# Pub functions
 pub-clean () {
   rm -rf .pub .packages pubspec.lock && find . -name packages | xargs rm -rf
 }
@@ -14,6 +15,7 @@ pub-clean-cache () {
   rm -rf ~/.pub-cache
 }
 
+# not used yet
 pub-generate-tests () {
   pub run dart_dev gen-test-runner
 }
@@ -26,6 +28,7 @@ pub-serve () {
   pub run dart_dev serve
 }
 
+# not used yet
 pub-serve-chrome () {
   pub run dart_dev serve --web-compiler=dart2js
 }
@@ -34,13 +37,17 @@ pub-upgrade () {
   pub upgrade
 }
 
+# not used yet
 pub-get-solver () {
   pub get --packages-dir --verbosity=solver
 }
 
+# not used yet
 pub-get-solver-inconsistent () {
   pub get --packages-dir --verbosity solver | grep "inconsistent" -A 2 | sed -e "s/\ |//g"
 }
+
+# qdart flag functions
 
 q-clean () {
   echo '--- Cleaning root pub dependencies ---'
@@ -57,7 +64,7 @@ q-clean () {
   fi
 }
 
-q-clean-all () {
+q-clean-hard () {
   echo '--- Cleaning root pub dependencies ---'
   pub-clean
 
@@ -71,6 +78,7 @@ q-clean-all () {
     (cd test/signals && pub-clean)
   fi
 
+  echo '--- Clearing pub cache ---'
   pub-clean-cache
 }
 
@@ -132,15 +140,22 @@ usage () {
   echo "    ./qdart -[single letter options]"
   echo
   echo "${underline}${bold}Options${normal}"
-  echo "                --clean, -c Clear out pub dependencies."
-  echo "                --format, -f Format dart code."
-  echo "                --get, -g Get pub dependencies."
+  echo "                --clean, -c Clear out pub dependencies. Performs ```rm -rf .pub .packages pubspec.lock &&"
+  echo "                 find . -name packages | xargs rm -rf```. Attempts to go into folders and"
+  echo "                 clean them in there are any pubspec.yaml files."
+  echo "                --clean-hard Performs all the actions of --clean in addition to clearing pub"
+  echo "                 cache with ```rm -rf ~/.pub-cache```"
+  echo "                --format, -f ```pub run dart_dev format``` of dart code."
+  echo "                --get, -g Perform a ```pub get``` for pub dependencies. Will attempt to go"
+  echo "                 into directories to find pubspec.yaml files."
   echo "                --help, -h Display this usage text."
-  echo "                --serve, -s Serve pub code."
-  echo "                --test, -t Test pub code."
-  echo "                --upgrade, -u Upgrade pub dependencies."
+  echo "                --serve, -s Serve dart code using ```pub run dart_dev serve```. Attempts to go into an"
+  echo "                 app directory and serve from there if available."
+  echo "                --test, -t Test dart code using ```pub run dart_dev test```."
+  echo "                --upgrade, -u Perform ```pub upgrade``` in directories with a pubspec.yaml."
   echo
   echo "${underline}${bold}Example${normal}"
+  echo "    ./qdart -gft"
   echo "    ./qdart --clean --get --serve"
   echo "    ./qdart -cgs"
   echo "    ./qdart -clean -gs"
@@ -151,6 +166,10 @@ while [ "$1" != "" ]; do
   options_found=1
   # Attempt to use GNU standard syntax
   case $1 in
+    --clean-hard)
+      q-clean-hard
+      shift
+      ;;
     --clean)
       q-clean
       shift
