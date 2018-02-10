@@ -2,9 +2,12 @@
 
 # Helper functions
 
-# not used yet
 chromium-checked-mode () {
   open /usr/local/opt/dart/Chromium.app --args --checked
+}
+
+pub-analyze () {
+  pub run dart_dev analyze
 }
 
 pub-clean () {
@@ -15,8 +18,27 @@ pub-clean-cache () {
   rm -rf ~/.pub-cache
 }
 
-# not used yet
-pub-generate-tests () {
+pub-copy-license () {
+  pub run dart_dev copy-license
+}
+
+pub-coverage () {
+  pub run dart_dev coverage
+}
+
+pub-docs () {
+  pub run dart_dev docs
+}
+
+pub-examples () {
+  pub run dart_dev examples
+}
+
+pub-format () {
+  pub run dart_dev format
+}
+
+pub-generate-test-runner () {
   pub run dart_dev gen-test-runner
 }
 
@@ -24,30 +46,45 @@ pub-get () {
   pub get --packages-dir
 }
 
+pub-get-package-solver () {
+  pub get --packages-dir --verbosity solver | grep "inconsistent" -A 2 | sed -e "s/\ |//g"
+}
+
+pub-saucelabs () {
+  pub run dart_dev saucelabs
+}
+
 pub-serve () {
   pub run dart_dev serve
 }
 
-# not used yet
-pub-serve-chrome () {
+pub-serve-dart2js () {
   pub run dart_dev serve --web-compiler=dart2js
+}
+
+pub-task-runner () {
+  pub run dart_dev task-runner
+}
+
+pub-test () {
+  pub run dart_dev test
 }
 
 pub-upgrade () {
   pub upgrade
 }
 
-# not used yet
-pub-get-solver () {
-  pub get --packages-dir --verbosity=solver
-}
-
-# not used yet
-pub-get-solver-inconsistent () {
-  pub get --packages-dir --verbosity solver | grep "inconsistent" -A 2 | sed -e "s/\ |//g"
-}
-
 # qdart flag functions
+
+q-analyze () {
+  echo '--- Analyzing project ---'
+  pub-analyze
+}
+
+q-chromium-checked-mode () {
+  echo '--- Launching chromium in checked mode ---'
+  chromium-checked-mode
+}
 
 q-clean () {
   echo '--- Cleaning root pub dependencies ---'
@@ -82,9 +119,34 @@ q-clean-hard () {
   pub-clean-cache
 }
 
+q-copy-license () {
+  echo '--- Copying LICENSE file ---'
+  pub-copy-license
+}
+
+q-coverage () {
+  echo '--- Collecting test coverage ---'
+  pub-coverage
+}
+
+q-docs () {
+  echo '--- Generating documents ---'
+  pub-docs
+}
+
+q-examples () {
+  echo '--- Serving examples ---'
+  pub-examples
+}
+
 q-format () {
   echo '--- Formatting project ---'
-  pub run dart_dev format
+  pub-format
+}
+
+q-generate-test-runner () {
+  echo '--- Generating test runner ---'
+  pub-generate-test-runner
 }
 
 q-get () {
@@ -102,6 +164,26 @@ q-get () {
   fi
 }
 
+q-get-package-solver () {
+  echo '--- Getting/Solving root pub dependencies ---'
+  pub-get-package-solver
+
+  if [ -d "app" ]; then
+    echo '--- Getting/Solving app pub dependencies ---'
+    (cd app && pub-get-package-solver)
+  fi
+
+  if [ -d "test/signals" ]; then
+    echo '--- Getting/Solving signals pub dependencies ---'
+    (cd test/signals && pub-get-package-solver)
+  fi
+}
+
+q-saucelabs () {
+  echo '-- Compiling tests for Sauce Labs --'
+  pub-saucelabs
+}
+
 q-serve () {
   if [ -d "app" ]; then
     echo '--- Serving project in app directory ---'
@@ -112,9 +194,24 @@ q-serve () {
   fi
 }
 
+q-serve-dart2js () {
+  if [ -d "app" ]; then
+    echo '--- Serving project with dart2js in app directory ---'
+    (cd app && pub-serve)
+  else
+    echo '--- Serving project with dart2js ---'
+    pub-serve
+  fi
+}
+
+q-task-runner () {
+  echo '--- Executing task runner ---'
+  pub-task-runner
+}
+
 q-test () {
   echo '--- Testing project ---'
-  pub run dart_dev test
+  pub-test
 }
 
 q-upgrade () {
@@ -133,26 +230,32 @@ q-upgrade () {
 }
 
 usage () {
-  echo "${underline}${bold}GNU Usage${normal}"
+  echo "GNU Usage"
   echo "    ./qdart [options]"
   echo
-  echo "${underline}${bold}POSIX Usage${normal}"
+  echo "POSIX Usage"
   echo "    ./qdart -[single letter options]"
   echo
-  echo "${underline}${bold}Options${normal}"
-  echo "                --clean, -c Clear out pub dependencies. Performs ```rm -rf .pub .packages pubspec.lock &&"
-  echo "                 find . -name packages | xargs rm -rf```. Attempts to go into folders and"
-  echo "                 clean them in there are any pubspec.yaml files."
-  echo "                --clean-hard Performs all the actions of --clean in addition to clearing pub"
-  echo "                 cache with ```rm -rf ~/.pub-cache```"
-  echo "                --format, -f ```pub run dart_dev format``` of dart code."
-  echo "                --get, -g Perform a ```pub get``` for pub dependencies. Will attempt to go"
-  echo "                 into directories to find pubspec.yaml files."
-  echo "                --help, -h Display this usage text."
-  echo "                --serve, -s Serve dart code using ```pub run dart_dev serve```. Attempts to go into an"
-  echo "                 app directory and serve from there if available."
-  echo "                --test, -t Test dart code using ```pub run dart_dev test```."
-  echo "                --upgrade, -u Perform ```pub upgrade``` in directories with a pubspec.yaml."
+  echo "Options"
+  echo "        --analyze, -a : runs the \`dartanalyzer\` over source code."
+  echo "        --chromium-checked-mode : launches Chromium in checked mode."
+  echo "        --clean, -c : clears out pub dependencies. Performs \`rm -rf .pub .packages pubspec.lock && find . -name packages | xargs rm -rf\`. Attempts to go into directories with pubspec.yaml files."
+  echo "        --clean-hard: performs all the actions of \`--clean\` in addition to clearing pub cache with \`rm -rf ~/.pub-cache\`."
+  echo "        --copy-license : copies a LICENSE file to all applicable files."
+  echo "        --coverage : collects coverage over test suites (unit, integration, and functional) and generates a report. Uses the coverage package."
+  echo "        --docs, d : runs the tool from the \`dartdoc\` package to generate docs."
+  echo "        --examples, e : uses \`pub serve\` to serve the project examples."
+  echo "        --format, -f : runs the \`dartfmt\` tool from the \`dart_style\` package over source code."
+  echo "        --generate-test-runner : generates a test runner file that allows for faster test execution."
+  echo "        --get, -g : runs \`pub get\` for pub dependencies. Will attempt to go into directories to find pubspec.yaml files."
+  echo "        --get-package-solver : gets and identifies pub dependency issues. Will attempt to go into directories to find pubspec.yaml files."
+  echo "        --help, -h : displays this usage text."
+  echo "        --saucelabs : compiles dart unit tests that can be run in the browser and executes them on various platforms using Sauce Labs."
+  echo "        --serve, -s : uses \`pub serve\` to serve the project. Attempts to go into an app directory and serve from there if available."
+  echo "        --serve-dart2js : serves the project using the \`dart2js\` compilation option to work on non-Chromium browsers."
+  echo "        --task-runner : uses \`tast-runner\` to perform tasks found on the \`config.taskRunnerConfig\`"
+  echo "        --test, -t : runs test suites (unit, integration, and functional) via the \`test\` package test runner."
+  echo "        --upgrade, -u : runs \`pub upgrade\` in directories with a pubspec.yaml."
   echo
   echo "${underline}${bold}Example${normal}"
   echo "    ./qdart -gft"
@@ -166,6 +269,14 @@ while [ "$1" != "" ]; do
   options_found=1
   # Attempt to use GNU standard syntax
   case $1 in
+    --analyze)
+      q-analyze
+      shift
+      ;;
+    --chromium-checked-mode)
+      q-chromium-checked-mode
+      shift
+      ;;
     --clean-hard)
       q-clean-hard
       shift
@@ -174,20 +285,56 @@ while [ "$1" != "" ]; do
       q-clean
       shift
       ;;
+    --copy-license)
+      q-copy-license
+      shift
+      ;;
+    --coverage)
+      q-coverage
+      shift
+      ;;
+    --docs)
+      q-docs
+      shift
+      ;;
+    --examples)
+      q-examples
+      shift
+      ;;
     --format)
       q-format
+      shift
+      ;;
+    --generate-test-runner)
+      q-generate-test-runner
       shift
       ;;
     --get)
       q-get
       shift
       ;;
+    --get-package-solver)
+      q-get-package-solver
+      shift
+      ;;
     --help)
       usage
       shift
       ;;
+    --saucelabs)
+      q-saucelabs
+      shift
+      ;;
     --serve)
       q-serve
+      shift
+      ;;
+    --serve-dart2js)
+      q-serve-dart2js
+      shift
+      ;;
+    --task-runner)
+      q-task-runner
       shift
       ;;
     --test)
@@ -206,10 +353,19 @@ while [ "$1" != "" ]; do
       ;;
     -*)
       # POSIX standard syntax
-      while getopts :cfghstu- opt; do
+      while getopts :acdefghstu- opt; do
         case $opt in
+          a)
+            q-analyze
+            ;;
           c)
             q-clean
+            ;;
+          d)
+            q-docs
+            ;;
+          e)
+            q-examples
             ;;
           f)
             q-format

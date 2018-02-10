@@ -18,21 +18,27 @@ POSIX Usage
     ./qdart -[single letter options]
 
 Options
-                --clean, -c Clear out pub dependencies. Performs ```rm -rf .pub .packages pubspec.lock &&
-                 find . -name packages | xargs rm -rf```. Attempts to go into folders and
-                 clean them in there are any pubspec.yaml files.
-                --clean-hard Performs all the actions of --clean in addition to clearing pub
-                 cache with ```rm -rf ~/.pub-cache```
-                --format, -f ```pub run dart_dev format``` of dart code.
-                --get, -g Perform a ```pub get``` for pub dependencies. Will attempt to go
-                 into directories to find pubspec.yaml files.
-                --help, -h Display this usage text.
-                --serve, -s Serve dart code using ```pub run dart_dev serve```. Attempts to go into an
-                 app directory and serve from there if available.
-                --test, -t Test dart code using ```pub run dart_dev test```.
-                --upgrade, -u Perform ```pub upgrade``` in directories with a pubspec.yaml.
+        --analyze, -a : runs the `dartanalyzer` over source code.
+        --chromium-checked-mode : launches Chromium in checked mode.
+        --clean, -c : clears out pub dependencies. Performs `rm -rf .pub .packages pubspec.lock && find . -name packages | xargs rm -rf`. Attempts to go into directories with pubspec.yaml files.
+        --clean-hard: performs all the actions of `--clean` in addition to clearing pub cache with `rm -rf ~/.pub-cache`.
+        --copy-license : copies a LICENSE file to all applicable files.
+        --coverage : collects coverage over test suites (unit, integration, and functional) and generates a report. Uses the coverage package.
+        --docs, d : runs the tool from the `dartdoc` package to generate docs.
+        --examples, e : uses `pub serve` to serve the project examples.
+        --format, -f : runs the `dartfmt` tool from the `dart_style` package over source code.
+        --generate-test-runner : generates a test runner file that allows for faster test execution.
+        --get, -g : runs `pub get` for pub dependencies. Will attempt to go into directories to find pubspec.yaml files.
+        --get-package-solver : gets and identifies pub dependency issues. Will attempt to go into directories to find pubspec.yaml files.
+        --help, -h : displays this usage text.
+        --saucelabs : compiles dart unit tests that can be run in the browser and executes them on various platforms using Sauce Labs.
+        --serve, -s : uses `pub serve` to serve the project. Attempts to go into an app directory and serve from there if available.
+        --serve-dart2js : serves the project using the `dart2js` compilation option to work on non-Chromium browsers.
+        --task-runner : uses `tast-runner` to perform tasks found on the `config.taskRunnerConfig`
+        --test, -t : runs test suites (unit, integration, and functional) via the `test` package test runner.
+        --upgrade, -u : runs `pub upgrade` in directories with a pubspec.yaml.
 
-Examples
+Example
     ./qdart -gft
     ./qdart --clean --get --serve
     ./qdart -cgs
