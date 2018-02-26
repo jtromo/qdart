@@ -27,14 +27,15 @@ Options
         --docs, d : runs the tool from the `dartdoc` package to generate docs.
         --examples, e : uses `pub serve` to serve the project examples.
         --format, -f : runs the `dartfmt` tool from the `dart_style` package over source code.
-        --generate-test-runner : generates a test runner file that allows for faster test execution.
+        --gen-test-runner : generates a test runner file that allows for faster test execution.
         --get, -g : runs `pub get` for pub dependencies. Will attempt to go into directories to find pubspec.yaml files.
         --get-package-solver : gets and identifies pub dependency issues. Will attempt to go into directories to find pubspec.yaml files.
         --help, -h : displays this usage text.
+        --prune, -p : cleans up local branches after they have been merged.
         --saucelabs : compiles dart unit tests that can be run in the browser and executes them on various platforms using Sauce Labs.
         --serve, -s : uses `pub serve` to serve the project. Attempts to go into an app directory and serve from there if available.
         --serve-dart2js : serves the project using the `dart2js` compilation option to work on non-Chromium browsers.
-        --task-runner : uses `tast-runner` to perform tasks found on the `config.taskRunnerConfig`
+        --task-runner : uses `task-runner` to perform tasks found on the `config.taskRunnerConfig`
         --test, -t : runs test suites (unit, integration, and functional) via the `test` package test runner.
         --upgrade, -u : runs `pub upgrade` in directories with a pubspec.yaml.
 

@@ -3,7 +3,15 @@
 # Helper functions
 
 chromium-checked-mode () {
-  open /usr/local/opt/dart/Chromium.app --args --checked
+  DART_FLAGS=--checked open /usr/local/opt/dart/Chromium.app
+}
+
+prune-local () {
+  git branch --merged master | grep -v "\master" | xargs -n 1 git branch -d
+}
+
+prune () {
+  git fetch --prune origin && prune-local
 }
 
 pub-analyze () {
@@ -144,7 +152,7 @@ q-format () {
   pub-format
 }
 
-q-generate-test-runner () {
+q-gen-test-runner () {
   echo '--- Generating test runner ---'
   pub-generate-test-runner
 }
@@ -177,6 +185,11 @@ q-get-package-solver () {
     echo '--- Getting/Solving signals pub dependencies ---'
     (cd test/signals && pub-get-package-solver)
   fi
+}
+
+q-prune () {
+  echo '--- Pruning local branches ---'
+  prune
 }
 
 q-saucelabs () {
@@ -246,14 +259,15 @@ usage () {
   echo "        --docs, d : runs the tool from the \`dartdoc\` package to generate docs."
   echo "        --examples, e : uses \`pub serve\` to serve the project examples."
   echo "        --format, -f : runs the \`dartfmt\` tool from the \`dart_style\` package over source code."
-  echo "        --generate-test-runner : generates a test runner file that allows for faster test execution."
+  echo "        --gen-test-runner : generates a test runner file that allows for faster test execution."
   echo "        --get, -g : runs \`pub get\` for pub dependencies. Will attempt to go into directories to find pubspec.yaml files."
   echo "        --get-package-solver : gets and identifies pub dependency issues. Will attempt to go into directories to find pubspec.yaml files."
   echo "        --help, -h : displays this usage text."
+  echo "        --prune, -p : cleans up local branches after they have been merged."
   echo "        --saucelabs : compiles dart unit tests that can be run in the browser and executes them on various platforms using Sauce Labs."
   echo "        --serve, -s : uses \`pub serve\` to serve the project. Attempts to go into an app directory and serve from there if available."
   echo "        --serve-dart2js : serves the project using the \`dart2js\` compilation option to work on non-Chromium browsers."
-  echo "        --task-runner : uses \`tast-runner\` to perform tasks found on the \`config.taskRunnerConfig\`"
+  echo "        --task-runner : uses \`task-runner\` to perform tasks found on the \`config.taskRunnerConfig\`"
   echo "        --test, -t : runs test suites (unit, integration, and functional) via the \`test\` package test runner."
   echo "        --upgrade, -u : runs \`pub upgrade\` in directories with a pubspec.yaml."
   echo
@@ -305,8 +319,8 @@ while [ "$1" != "" ]; do
       q-format
       shift
       ;;
-    --generate-test-runner)
-      q-generate-test-runner
+    --gen-test-runner)
+      q-gen-test-runner
       shift
       ;;
     --get)
@@ -319,6 +333,10 @@ while [ "$1" != "" ]; do
       ;;
     --help)
       usage
+      shift
+      ;;
+    --prune)
+      q-prune
       shift
       ;;
     --saucelabs)
@@ -353,7 +371,7 @@ while [ "$1" != "" ]; do
       ;;
     -*)
       # POSIX standard syntax
-      while getopts :acdefghstu- opt; do
+      while getopts :acdefghpstu- opt; do
         case $opt in
           a)
             q-analyze
@@ -375,6 +393,9 @@ while [ "$1" != "" ]; do
             ;;
           h)
             usage
+            ;;
+          p)
+            q-prune
             ;;
           s)
             q-serve
