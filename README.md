@@ -46,6 +46,9 @@ Example
     ./qdart -clean -gs
 ```
 
+## Contributions
+[Contribution guidelines for this project](.github/CONTRIBUTING.md)
+
 ## Installation
 Can be installed via brew:
 ```brew install jtromo/homebrew-ember-spark/qdart```
