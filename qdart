@@ -210,10 +210,10 @@ q-serve () {
 q-serve-dart2js () {
   if [ -d "app" ]; then
     echo '--- Serving project with dart2js in app directory ---'
-    (cd app && pub-serve)
+    (cd app && pub-serve-dart2js)
   else
     echo '--- Serving project with dart2js ---'
-    pub-serve
+    pub-serve-dart2js
   fi
 }
 
