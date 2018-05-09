@@ -251,7 +251,7 @@ usage () {
   echo
   echo "Options"
   echo "        --analyze, -a : runs the \`dartanalyzer\` over source code."
-  echo "        --chromium-checked-mode : launches Chromium in checked mode."
+  echo "        --chromium-checked-mode : launches Chromium in checked mode using \`DART_FLAGS=--checked open /usr/local/opt/dart/Chromium.app\`."
   echo "        --clean, -c : clears out pub dependencies. Performs \`rm -rf .pub .packages pubspec.lock && find . -name packages | xargs rm -rf\`. Attempts to go into directories with pubspec.yaml files."
   echo "        --clean-hard: performs all the actions of \`--clean\` in addition to clearing pub cache with \`rm -rf ~/.pub-cache\`."
   echo "        --copy-license : copies a LICENSE file to all applicable files."
@@ -263,7 +263,7 @@ usage () {
   echo "        --get, -g : runs \`pub get\` for pub dependencies. Will attempt to go into directories to find pubspec.yaml files."
   echo "        --get-package-solver : gets and identifies pub dependency issues. Will attempt to go into directories to find pubspec.yaml files."
   echo "        --help, -h : displays this usage text."
-  echo "        --prune, -p : cleans up local branches after they have been merged."
+  echo "        --prune, -p : cleans up local branches after they have been merged using \`git fetch --prune origin && git branch --merged master | grep -v \"\master\" | xargs -n 1 git branch -d\`."
   echo "        --saucelabs : compiles dart unit tests that can be run in the browser and executes them on various platforms using Sauce Labs."
   echo "        --serve, -s : uses \`pub serve\` to serve the project. Attempts to go into an app directory and serve from there if available."
   echo "        --serve-dart2js : serves the project using the \`dart2js\` compilation option to work on non-Chromium browsers."
