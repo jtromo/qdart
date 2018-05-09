@@ -49,7 +49,11 @@ Example
 ## Contributions
 [Contribution guidelines for this project](.github/CONTRIBUTING.md).
 
-## Installation
-Can be installed via brew:
+## Installation via homebrew
+Tap repository containing formulae:
+
 ```brew tap jtromo/homebrew-ember-spark```
+
+Install Quick Dart:
+
 ```brew install jtromo/homebrew-ember-spark/qdart```
