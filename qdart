@@ -95,33 +95,15 @@ q-chromium-checked-mode () {
 }
 
 q-clean () {
-  echo '--- Cleaning root pub dependencies ---'
-  pub-clean
-
-  if [ -d "app" ]; then
-    echo '--- Cleaning app pub dependencies ---'
-    (cd app && pub-clean)
-  fi
-
-  if [ -d "test/signals" ]; then
-    echo '--- Cleaning signals pub dependencies ---'
-    (cd test/signals && pub-clean)
-  fi
+  for file in $(find . -name 'pubspec.yaml' -maxdepth 4); do
+    dir=${file%/*}
+    echo "--- Cleaning pub dependencies in $dir ---"
+    (cd $dir && pub-clean)
+  done
 }
 
 q-clean-hard () {
-  echo '--- Cleaning root pub dependencies ---'
-  pub-clean
-
-  if [ -d "app" ]; then
-    echo '--- Cleaning app pub dependencies ---'
-    (cd app && pub-clean)
-  fi
-
-  if [ -d "test/signals" ]; then
-    echo '--- Cleaning signals pub dependencies ---'
-    (cd test/signals && pub-clean)
-  fi
+  q-clean
 
   echo '--- Clearing pub cache ---'
   pub-clean-cache
@@ -158,33 +140,19 @@ q-gen-test-runner () {
 }
 
 q-get () {
-  echo '--- Getting root pub dependencies ---'
-  pub-get
-
-  if [ -d "app" ]; then
-    echo '--- Getting app pub dependencies ---'
-    (cd app && pub-get)
-  fi
-
-  if [ -d "test/signals" ]; then
-    echo '--- Getting signals pub dependencies ---'
-    (cd test/signals && pub-get)
-  fi
+  for file in $(find . -name 'pubspec.yaml' -maxdepth 4); do
+    dir=${file%/*}
+    echo "--- Getting pub dependencies in $dir ---"
+    (cd $dir && pub-get)
+  done
 }
 
 q-get-package-solver () {
-  echo '--- Getting/Solving root pub dependencies ---'
-  pub-get-package-solver
-
-  if [ -d "app" ]; then
-    echo '--- Getting/Solving app pub dependencies ---'
-    (cd app && pub-get-package-solver)
-  fi
-
-  if [ -d "test/signals" ]; then
-    echo '--- Getting/Solving signals pub dependencies ---'
-    (cd test/signals && pub-get-package-solver)
-  fi
+  for file in $(find . -name 'pubspec.yaml' -maxdepth 4); do
+    dir=${file%/*}
+    echo "--- Getting/Solving pub dependencies in $dir ---"
+    (cd $dir && pub-get-package-solver)
+  done
 }
 
 q-prune () {
@@ -228,18 +196,11 @@ q-test () {
 }
 
 q-upgrade () {
-  echo '--- Upgrading root pub dependencies ---'
-  pub-upgrade
-
-  if [ -d "app" ]; then
-    echo '--- Upgrading app pub dependencies ---'
-    (cd app && pub-upgrade)
-  fi
-
-  if [ -d "test/signals" ]; then
-    echo '--- Upgrading signals pub dependencies ---'
-    (cd test/signals && pub-upgrade)
-  fi
+  for file in $(find . -name 'pubspec.yaml' -maxdepth 4); do
+    dir=${file%/*}
+    echo "--- Upgrading pub dependencies in $dir ---"
+    (cd $dir && pub-upgrade)
+  done
 }
 
 usage () {
